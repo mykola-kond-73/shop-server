@@ -1,0 +1,9 @@
+# DIRS
+/node_modules/
+/dist/
+/build/
+/logs/
+uploads
+
+# FILES
+.env
