@@ -1,28 +1,68 @@
-import { AuthModel } from '../models/auth'
-import { AuthDataType } from '../types/models/authTypes';
-import jwt from 'jsonwebtoken'
-import {key} from '../utils/env/keys'
+import { NextFunction, Request, Response } from 'express'
+import { Responce } from '../utils/responceObject'
+import { authService } from '../services/auth'
+import { _decode } from '../utils/crypto/decode'
 
-export class AuthControl {
-    models: { auth: AuthModel }
+//! res.cookie('user',data.refreshToken,{maxAge:12*60*60*1000,httpOnly:true})
 
-    constructor(data: AuthDataType) {
-        this.models = {
-            auth: new AuthModel(data)
-        };
+//! const {user}=req.cookies
+//! res.clearCookie('user')
+
+class AuthController {
+    async loginCustomer(req: Request, res: Response, next: NextFunction) {
+        try {
+            const payload={
+                email:await _decode(req.body.email),
+                password:await _decode(req.body.password)
+            }
+
+            const data = await authService.login(payload)
+            req.session!.user = data.refreshToken
+
+            return res.status(201).json(new Responce(201, '', data))
+        } catch (error: any) {
+            next(error)
+        }
     }
 
-    async login() {
-        const data = await this.models.auth.login();
-        const token = jwt.sign(data, key!, { expiresIn: 60 * 60 * 1000 })
+    async loginStaff(req: Request, res: Response, next: NextFunction) {
+        try {
+            const payload={
+                email:await _decode(req.body.email),
+                password:await _decode(req.body.password)
+            }
+            const data = await authService.login(payload, true)
+            req.session!.user = data.refreshToken
 
-        return {id:data._id,token};
+            return res.status(201).json(new Responce(201, '', data))
+        } catch (error: any) {
+            next(error)
+        }
     }
 
-    async loginCust() {
-        const data = await this.models.auth.loginCust()
-        const token = jwt.sign(data, key!, {expiresIn: 60 * 60 * 1000})
+    async logout(req: Request, res: Response, next: NextFunction) {
+        try {
+            const refreshToken=req.session!.user
+            await authService.logout(refreshToken)
+            delete req.session!.user
 
-        return {id:data._id,token}
+            return res.status(204).json(new Responce(204))
+        } catch (error: any) {
+            next(error)
+        }
+    }
+
+    async refresh(req: Request, res: Response, next: NextFunction) {
+        try {
+            const refreshToken=req.session!.user
+            const data=await authService.refresh(refreshToken)
+            req.session!.user = data.refreshToken
+
+            return res.status(201).json(new Responce(201, '', data))
+        } catch (error: any) {
+            next(error)
+        }
     }
 }
+
+export const authController = new AuthController()

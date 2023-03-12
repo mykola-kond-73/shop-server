@@ -1,5 +1,5 @@
 import {Request,Response,NextFunction} from 'express'
-import{ _decode} from '../crypto/decode'
+import{ _decode} from '../utils/crypto/decode'
 
 export const decode=async(req:Request,res:Response,next:NextFunction)=>{
     const emailUtf8=await _decode(req.body.email)

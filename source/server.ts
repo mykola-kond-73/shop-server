@@ -5,11 +5,11 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import helmet from 'helmet'
 import fileUpload from 'express-fileupload'
-import auth from './routers/auth/index'
-import customers from './routers/customers/inedx'
-import orders from './routers/oredres/index'
-import products from './routers/products/index'
-import staff from './routers/staff/index'
+import auth from './routers/auth'
+import customers from './routers/customers'
+import orders from './routers/orders'
+import products from './routers/products'
+import staff from './routers/staffs'
 import { Responce } from './utils/responceObject'
 import { sessionOptions } from './utils/options/session'
 import { corsOptions } from './utils/options/cors'
@@ -18,6 +18,7 @@ import { queryLogger, errorLogger } from './utils/loger'
 import swaggerUi from 'swagger-ui-express'
 import { swaggerOptions } from './utils/options/swagger'
 import swaggerDocument  from '../swagger.json'
+import { errorMiddleware } from './middlewares/error'
 
 const app = express()
 
@@ -30,12 +31,6 @@ app.use(cors(corsOptions))
 app.use(bodyParser.json({ limit: '10kb' }))
 app.use(fileUpload({}))
 app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerDocument));
-
-// app.use(function(req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//     next();
-// })
 
 if (process.env.NODE_ENV === 'production') {
     console.log(process.env.NODE_ENV)
@@ -51,19 +46,14 @@ app.use('/customers', customers)
 app.use('/products', products)
 app.use('/orders', orders)
 
-// app.use('*',(req,res,next)=>{
-//     try{
-//         console.log(req)
-//         res.status(405).json(new Responce(405,'no your endpoints'))
-//     }catch(error){
-//         next(error)
-//     }
-// })
-
-app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-
-    errorLogger.error(`status:500 ${error.message}`)
-    res.status(500).json(new Responce(500, 'Sory server error'))
+app.use('*',(req,res,next)=>{
+    try{
+        res.status(405).json(new Responce(405,'no your endpoints'))
+    }catch(error){
+        next(error)
+    }
 })
+
+app.use(errorMiddleware)
 
 export default app

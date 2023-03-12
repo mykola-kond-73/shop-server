@@ -1,5 +1,6 @@
 import {Request,Response,NextFunction} from 'express'
-const getSecretKeyToCreateAdmin=require('../env/getSecretKeyToCreateAdmin')
+import { ApiError } from '../exceptions/exceptions'
+import {getSecretKeyToCreateAdmin} from '../utils/env/getSecretKeyToCreateAdmin'
 
 export const ChechSecretKeyToCreateAdmin=async(req:Request,res:Response,next:NextFunction)=>{
     if(req.body.isAdmin){
@@ -8,7 +9,7 @@ export const ChechSecretKeyToCreateAdmin=async(req:Request,res:Response,next:Nex
             delete req.body.secretKey            
             next()
         }else{
-            throw new Error('no valid secret key')
+            throw ApiError.BadRequest('no valid secret key')
         }
     }else{
         next()

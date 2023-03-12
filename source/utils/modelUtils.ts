@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt'
+import { ApiError } from '../exceptions/exceptions'
 import {_encode} from './crypto/encode'
 
 const _runningData=async(dataOfDb:Array<any>,newData:any)=>{
@@ -9,7 +10,7 @@ const _runningData=async(dataOfDb:Array<any>,newData:any)=>{
 }
 
 const _uniquenessСheck=async(dbData:string,newData:string)=>{
-    if(dbData==newData) throw new Error('user with this email or phone number already exists')      
+    if(dbData==newData) throw ApiError.BadRequest('user with this email or phone number already exists')      
 }
 
 const _transformGetUser=async(fullname:string)=>{
