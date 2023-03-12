@@ -2,7 +2,6 @@ import { ApiError } from '../exceptions/exceptions';
 import {Request,Response,NextFunction} from 'express'
 import Ajv from 'ajv'
 import errorHandler from 'express-async-handler'
-import {Responce} from '../utils/responceObject'
 import {validationErrorLogger} from '../utils/loger'
 
 export const validator = (schema:object) =>errorHandler(async (req:Request, res:Response, next:NextFunction) => {
@@ -23,7 +22,6 @@ export const validator = (schema:object) =>errorHandler(async (req:Request, res:
         next()
     } else {
         validationErrorLogger.error(`${req.method} ${req.originalUrl} ${JSON.stringify(req.body)}`)
-        // res.status(400).json(new Responce(400, 'error validation'))
         next(ApiError.BadRequest('error validation'))
     }
 }) 
