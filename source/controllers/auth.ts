@@ -17,6 +17,7 @@ class AuthController {
             }
 
             const data = await authService.login(payload)
+        //@ts-ignore
             req.session!.user = data.refreshToken
 
             return res.status(201).json(new Responce(201, '', data))
@@ -32,6 +33,7 @@ class AuthController {
                 password:await _decode(req.body.password)
             }
             const data = await authService.login(payload, true)
+        //@ts-ignore
             req.session!.user = data.refreshToken
 
             return res.status(201).json(new Responce(201, '', data))
@@ -42,8 +44,11 @@ class AuthController {
 
     async logout(req: Request, res: Response, next: NextFunction) {
         try {
+        //@ts-ignore
             const refreshToken=req.session!.user
             await authService.logout(refreshToken)
+        //@ts-ignore
+            
             delete req.session!.user
 
             return res.status(204).json(new Responce(204))
@@ -54,8 +59,11 @@ class AuthController {
 
     async refresh(req: Request, res: Response, next: NextFunction) {
         try {
+        //@ts-ignore
             const refreshToken=req.session!.user
             const data=await authService.refresh(refreshToken)
+        //@ts-ignore
+            
             req.session!.user = data.refreshToken
 
             return res.status(201).json(new Responce(201, '', data))
