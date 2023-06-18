@@ -55,6 +55,7 @@ In .env file musst be kyes:
 
 `NODE_ENV` - mode (development, production)
 `DB_PASS` - database password
+`DB_HOST` - database host
 `DB_USER` - database user
 `DB_DATABASE` - database name
 `JWT_ACCESS_TOKEN` - secret key for the access token
